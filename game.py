@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import pygame,sys,random,math,shelve
 from pygame.locals import *
@@ -18,10 +18,18 @@ def mx(p,color):
 
 def mn(p,a):
     m = 15
+    q = 0
     for i in range(len(p)):
         if p[i].value < m and p[i].value > a:
             m = p[i].value
-    return m
+            q = p[i].type
+    if q == 0:
+        m = 15
+        for i in range(len(p)):
+            if p[i].value < m and p[i].value > 0:
+                m = p[i].value
+                q = p[i].type
+    return (m,q)
 
 def refresh(screen,p1,p2,p3,p4,dealt,deck,trump,w):
     screen.fill(green)
@@ -51,26 +59,26 @@ def refresh(screen,p1,p2,p3,p4,dealt,deck,trump,w):
         textRectObj.center = (1400, 170)
         DISPLAYSURF.blit(textSurfaceObj,textRectObj)
     for i in range(len(p4)):
-        a = 'gray_back.png'
+        a = 'Photos/gray_back.png'
         #a = str(p4[i].value)+p4[i].type+'.png'
         img = pygame.image.load(a)
         img = pygame.transform.scale(img,(80,140))
         DISPLAYSURF.blit(img,(400+50*i,800))
     for i in range(len(p1)):
-        a = 'blue_back.png'
+        a = 'Photos/blue_back.png'
         #a = str(p1[i].value) + p1[i].type + '.png'
         img = pygame.image.load(a)
         img = pygame.transform.rotate(img,90)
         img = pygame.transform.scale(img,(140,80))
         DISPLAYSURF.blit(img,(100,200+50*i))
     for i in range(len(p2)):
-        a = 'green_back.png'
+        a = 'Photos/green_back.png'
         #a = str(p2[i].value) + p2[i].type + '.png'
         img = pygame.image.load(a)
         img = pygame.transform.scale(img,(80,140))
         DISPLAYSURF.blit(img,(400 + 50*i,100))
     for i in range(len(p3)):
-        a = 'purple_back.png'
+        a = 'Photos/purple_back.png'
         #a = str(p3[i].value) + p3[i].type + '.png'
         img = pygame.image.load(a)
         img = pygame.transform.rotate(img,270)
@@ -78,43 +86,43 @@ def refresh(screen,p1,p2,p3,p4,dealt,deck,trump,w):
         DISPLAYSURF.blit(img,(1400,200+50*i))
     for i in range(len(dealt)):
         if dealt[i].player == 1:
-            a = str(dealt[i].value) + dealt[i].type + '.png'
+            a = 'Photos/' + str(dealt[i].value) + dealt[i].type + '.png'
             img = pygame.image.load(a)
             img = pygame.transform.scale(img,(80,140))
             DISPLAYSURF.blit(img,(450,500))
         if dealt[i].player == 2:
-            a = str(dealt[i].value) + dealt[i].type + '.png'
+            a = 'Photos/'+str(dealt[i].value) + dealt[i].type + '.png'
             img = pygame.image.load(a)
             img = pygame.transform.scale(img,(80,140))
             DISPLAYSURF.blit(img,(700,250))
         if dealt[i].player == 3:
-            a = str(dealt[i].value) + dealt[i].type + '.png'
+            a = 'Photos/'+str(dealt[i].value) + dealt[i].type + '.png'
             img = pygame.image.load(a)
             img = pygame.transform.scale(img,(80,140))
             DISPLAYSURF.blit(img,(900,500))
         if dealt[i].player == 4:
-            a = str(dealt[i].value) + dealt[i].type + '.png'
+            a = 'Photos/'+str(dealt[i].value) + dealt[i].type + '.png'
             img = pygame.image.load(a)
             img = pygame.transform.scale(img,(80,140))
             DISPLAYSURF.blit(img,(700,600))
-    a = '14' + trump + '.png'
+    a = 'Photos/'+'14' + trump + '.png'
     img = pygame.image.load(a)
     img = pygame.transform.scale(img,(80,140))
     DISPLAYSURF.blit(img,(100,0))
     for i in range(w[0]):
-        img = pygame.image.load('blue_back.png')
+        img = pygame.image.load('Photos/blue_back.png')
         img = pygame.transform.scale(img,(30,50))
         DISPLAYSURF.blit(img,(100+20*i,820))
     for i in range(w[1]):
-        img = pygame.image.load('green_back.png')
+        img = pygame.image.load('Photos/green_back.png')
         img = pygame.transform.scale(img,(30,50))
         DISPLAYSURF.blit(img,(450+20*i,40))
     for i in range(w[2]):
-        img = pygame.image.load('purple_back.png')
+        img = pygame.image.load('Photos/purple_back.png')
         img = pygame.transform.scale(img,(30,50))
         DISPLAYSURF.blit(img,(1300+20*i,820))
     for i in range(w[3]):
-        img = pygame.image.load('gray_back.png')
+        img = pygame.image.load('Photos/gray_back.png')
         img = pygame.transform.scale(img,(30,50))
         DISPLAYSURF.blit(img,(450+20*i,950))
     pygame.display.update()
@@ -170,28 +178,41 @@ def get_trump(p):
         return 'C'
 
 def arrange(p,dealt,deck,trump,w):
+    name = p[0].player
     h = []
     d = []
     s = []
     c = []
     for i in range(len(p)):
         if p[i].type == 'H':
-            h.append(p[i])
+            h.append(p[i].value)
         elif p[i].type == 'S':
-            s.append(p[i])
+            s.append(p[i].value)
         elif p[i].type == 'D':
-            d.append(p[i])
+            d.append(p[i].value)
         else:
-            c.append(p[i])
-    p = []
+            c.append(p[i].value)
+    h.sort(reverse=True)
+    s.sort(reverse=True)
+    d.sort(reverse=True)
+    c.sort(reverse=True)
+    j = 0
     for i in range(len(h)):
-        p.append(h[i])
+        p[j].type = 'H'
+        p[j].value = h[i]
+        j = j+1
     for i in range(len(s)):
-        p.append(s[i])
+        p[j].type = 'S'
+        p[j].value = s[i]
+        j = j+1
     for i in range(len(d)):
-        p.append(d[i])
+        p[j].type = 'D'
+        p[j].value = d[i]
+        j = j+1
     for i in range(len(c)):
-        p.append(c[i])
+        p[j].type = 'C'
+        p[j].value = c[i]
+        j = j+1
     return p
 
 def start(screen,p1,p2,p3,p4,deck,dealt,trump,w,win):
@@ -243,27 +264,27 @@ def play_user(screen,p1,p2,p3,p4,dealt,deck,trump,w,a):
         just = pygame.mouse.get_pos()
         if just[0] > 100 and just[0] < 240 and just[1] > 200 and just[1] < 280 + 50*len(p) and first == 1 and a == 1:
             for i in range(len(p)):
-                c = str(p[i].value)+p[i].type+'.png'
+                c = 'Photos/'+str(p[i].value)+p[i].type+'.png'
                 img = pygame.image.load(c)
                 img = pygame.transform.rotate(img,90)
                 img = pygame.transform.scale(img,(140,80))
                 DISPLAYSURF.blit(img,(100,200+50*i))
         elif just[0] > 400 and just[0] < 480 + 50*len(p) and just[1] > 100 and just[1] < 240 and first == 1 and a == 2:
             for i in range(len(p)):
-                c = str(p[i].value)+p[i].type+'.png'
+                c = 'Photos/'+str(p[i].value)+p[i].type+'.png'
                 img = pygame.image.load(c)
                 img = pygame.transform.scale(img,(80,140))
                 DISPLAYSURF.blit(img,(400+50*i,100))
         elif just[0] > 1400 and just[0] < 1540 and just[1] > 200 and just[1] < 280 + 50*len(p) and first == 1 and a == 3:
             for i in range(len(p)):
-                c = str(p[i].value)+p[i].type+'.png'
+                c = 'Photos/'+str(p[i].value)+p[i].type+'.png'
                 img = pygame.image.load(c)
                 img = pygame.transform.rotate(img,90)
                 img = pygame.transform.scale(img,(140,80))
                 DISPLAYSURF.blit(img,(1400,200+50*i))
         elif just[0] > 400 and just[0] < 480 + 50*len(p) and just[1] > 800 and just[1] < 940 and first == 1 and a == 4:
             for i in range(len(p)):
-                c = str(p[i].value)+p[i].type+'.png'
+                c = 'Photos/'+str(p[i].value)+p[i].type+'.png'
                 img = pygame.image.load(c)
                 img = pygame.transform.scale(img,(80,140))
                 DISPLAYSURF.blit(img,(400+50*i,800))
@@ -277,7 +298,7 @@ def play_user(screen,p1,p2,p3,p4,dealt,deck,trump,w,a):
                 sys.exit()
             if event.type == KEYDOWN and event.key == K_SPACE:
                 for i in range(len(p)):
-                    c = str(p[i].value)+p[i].type+'.png'
+                    c = 'Photos/'+str(p[i].value)+p[i].type+'.png'
                     img = pygame.image.load(c)
                     if a == 1:
                         img = pygame.transform.rotate(img,90)
@@ -395,7 +416,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
     pdm = mx(p,'D')
     psm = mx(p,'S')
     pcm = mx(p,'C')
-    k = mn(p,0)
+    k,col = mn(p,0)
     if phm == 0:
         phm = 1
     if pdm == 0:
@@ -411,6 +432,8 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
             a.append(p[i])
         else:
             b.append(p[i])
+    if(len(b) == 0):
+        b = a
     if len(dealt) == 0:
         if phm == hm:
             for i in range(len(p)):
@@ -473,9 +496,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                     refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                     return
         else:
-            k = mn(p,0)
+            k,col = mn(b,0)
             for i in range(len(p)):
-                if p[i].value == k:
+                if (p[i].value,p[i].type) == (k,col):
                     dealt.append(p[i])
                     p.pop(i)
                     if t == 1:
@@ -505,9 +528,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
             if len(r) == 0:
                 r = f
             if len(f) == 0:
-                k = mn(p,0)
+                k,col = mn(p,0)
                 for i in range(len(p)):
-                    if p[i].value == k:
+                    if (p[i].value,p[i].type) == (k,col):
                         dealt.append(p[i])
                         p.pop(i)
                         if t == 1:
@@ -521,9 +544,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                         refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                         return
             elif len(dealt) == 1:
-                j = mn(f,0)
+                j,col = mn(f,0)
                 for i in range(len(p)):
-                    if p[i].value == j and p[i].type == trump:
+                    if (p[i].value,p[i].type) == (j,col) and p[i].type == trump:
                         dealt.append(p[i])
                         p.pop(i)
                         if t == 1:
@@ -539,9 +562,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
             elif len(dealt) == 2:
                 if dealt[1].type == trump:
                     if mx(f,trump) > dealt[1].value:
-                        j = mn(f,dealt[1].value)
+                        j,col = mn(f,dealt[1].value)
                         for i in range(len(p)):
-                            if p[i].value == j and p[i].type == trump:
+                            if (p[i].value,p[i].type) == (j,col) and p[i].type == trump:
                                 dealt.append(p[i])
                                 p.pop(i)
                                 if t == 1:
@@ -555,9 +578,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                                 refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                                 return
                     else:
-                        k = mn(r,0)
+                        k,col = mn(r,0)
                         for i in range(len(p)):
-                            if p[i].value == k:
+                            if (p[i].value,p[i].type) == (k,col):
                                 dealt.append(p[i])
                                 p.pop(i)
                                 if t == 1:
@@ -571,10 +594,10 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                                 refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                                 return
                 else:
-                    if dealt[0].value == max:
-                        k = mn(r,0)
+                    if dealt[0].value == mx(deck,color):
+                        k,col = mn(r,0)
                         for i in range(len(p)):
-                            if p[i].value == k:
+                            if (p[i].value,p[i].type) == (k,col):
                                 dealt.append(p[i])
                                 p.pop(i)
                                 if t == 1:
@@ -588,9 +611,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                                 refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                                 return
                     else:
-                        k = mn(f,0)
+                        k,col = mn(f,0)
                         for i in range(len(p)):
-                            if p[i].value == k:
+                            if (p[i].value,p[i].type) == (k,col):
                                 dealt.append(p[i])
                                 p.pop(i)
                                 if t == 1:
@@ -622,8 +645,23 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                         refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                         return
             else:
+                if len(dealt) == 2:
+                        for i in range(len(p)):
+                            if (p[i].value,p[i].type) == mn(l,dealt[1].value) and p[i].type == color:
+                                dealt.append(p[i])
+                                p.pop(i)
+                                if t == 1:
+                                    p1 = p
+                                elif t == 2:
+                                    p2 = p
+                                elif t == 3:
+                                    p3 = p
+                                else:
+                                    p4 = p
+                                refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
+                                return
                 for i in range(len(p)):
-                    if p[i].value == mn(l,0) and p[i].type == color:
+                    if (p[i].value,p[i].type) == mn(l,0) and p[i].type == color:
                         dealt.append(p[i])
                         p.pop(i)
                         if t == 1:
@@ -652,9 +690,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
             if len(r) == 0:
                 r = f
             if len(f) == 0:
-                k = mn(r,0)
+                k,col = mn(r,0)
                 for i in range(len(p)):
-                    if p[i].value == k:
+                    if (p[i].value,p[i].type) == (k,col):
                         dealt.append(p[i])
                         p.pop(i)
                         if t == 1:
@@ -671,7 +709,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                 if dealt[2].type == trump:
                     if mx(f,trump) > dealt[2].value:
                         for i in range(len(p)):
-                            if p[i].value == mn(f,dealt[2].value) and p[i].type == trump:
+                            if (p[i].value,p[i].type) == mn(f,dealt[2].value) and p[i].type == trump:
                                 dealt.append(p[i])
                                 p.pop(i)
                                 if t == 1:
@@ -686,7 +724,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                                 return
                     else:
                         for i in range(len(p)):
-                            if p[i].value == mn(r,0):
+                            if (p[i].value,p[i].type) == mn(r,0):
                                 dealt.append(p[i])
                                 p.pop(i)
                                 if t == 1:
@@ -701,7 +739,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                                 return
                 elif dealt[1].type == trump:
                     for i in range(len(p)):
-                        if p[i].value == mn(r,0):
+                        if (p[i].value,p[i].type) == mn(r,0):
                             dealt.append(p[i])
                             p.pop(i)
                             if t == 1:
@@ -716,9 +754,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                             return
                 else:
                     if dealt[1].value == mx(deck,color) and dealt[1].type == color:
-                        k = mn(r,0)
+                        k,col = mn(r,0)
                         for i in range(len(p)):
-                            if p[i].value == k:
+                            if (p[i].value,p[i].type) == (k,col):
                                 dealt.append(p[i])
                                 p.pop(i)
                                 if t == 1:
@@ -732,7 +770,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                                 refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                                 return
                     for i in range(len(p)):
-                        if p[i].value == mn(f,0) and p[i].type == trump:
+                        if (p[i].value,p[i].type) == mn(f,0) and p[i].type == trump:
                             dealt.append(p[i])
                             p.pop(i)
                             if t == 1:
@@ -749,9 +787,9 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
             j = mx(l,color)
             k = mx(dealt,color)
             for q in range(len(dealt)):
-                if dealt[q].type == trump:
+                if dealt[q].type == trump and color!=trump:
                     for i in range(len(p)):
-                        if p[i].value == mn(l,0) and p[i].type == color:
+                        if (p[i].value,p[i].type) == mn(l,0) and p[i].type == color:
                             dealt.append(p[i])
                             p.pop(i)
                             if t == 1:
@@ -766,7 +804,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                             return
             if dealt[1].value == k and dealt[1].type == color:
                 for i in range(len(p)):
-                    if p[i].value == mn(l,0) and p[i].type == color:
+                    if (p[i].value,p[i].type) == mn(l,0) and p[i].type == color:
                         dealt.append(p[i])
                         p.pop(i)
                         if t == 1:
@@ -782,7 +820,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
             else:
                 if j > k:
                     for i in range(len(p)):
-                        if p[i].value == j and p[i].type == color:
+                        if (p[i].value,p[i].type) == mn(l,k) and p[i].type == color:
                             dealt.append(p[i])
                             p.pop(i)
                             if t == 1:
@@ -797,7 +835,7 @@ def play_comp(screen,p1,p2,p3,p4,dealt,deck,trump,w,t):
                             return
                 else:
                     for i in range(len(p)):
-                        if p[i].value == mn(l,0) and p[i].type == color:
+                        if (p[i].value,p[i].type) == mn(l,0) and p[i].type == color:
                             dealt.append(p[i])
                             p.pop(i)
                             if t == 1:
@@ -833,6 +871,7 @@ def game_1p(screen,win,save):
     dealt = []
     deck = []
     a = win
+    suits = 7
     chance = []
     p1 = []
     p2 = []
@@ -857,12 +896,31 @@ def game_1p(screen,win,save):
                     sys.exit()
                 if event.type == MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
+                    if w[0] + w[1] + w[2] + w[3] == 0:
+                        if mouse[0] > 400 and mouse[0] < 1080 and mouse[1] > 800 and mouse[1] < 940:
+                            for i in range(len(p4)):
+                                z = 'Photos/'+str(p4[i].value)+p4[i].type+'.png'
+                                img = pygame.image.load(z)
+                                img = pygame.transform.scale(img,(80,140))
+                                DISPLAYSURF.blit(img,(400+50*i,800))
+                            pygame.draw.rect(DISPLAYSURF,(0,255,0),(650,590,200,40))
+                            fontObj = pygame.font.Font('freesansbold.ttf', 32)
+                            textSurfaceObj = fontObj.render('Claim 9 deals', True, win1, (0,255,0))
+                            textRectObj = textSurfaceObj.get_rect()
+                            textRectObj.center = (750, 610)
+                            DISPLAYSURF.blit(textSurfaceObj,textRectObj)
+                            pygame.display.update()
+                    if mouse[0] > 650 and mouse[0] < 850 and mouse[1] > 590 and mouse[1] < 630:
+                        trump = get_trump(p4)
+                        suits = 9
+                        win = 4
+                        l = 1
+                        refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
                     if mouse[0] > 650 and mouse[0] < 850 and mouse[1] > 530 and mouse[1] < 570:
                         return 0
                     if mouse[0] > 650 and mouse[0] < 850 and mouse[1] > 470 and mouse[1] < 510:
                         l = 1
                     if mouse[0] > 1300 and mouse[0] < 1500 and mouse[1] > 150 and mouse[1] < 190:
-                        print('Hello')
                         shelf = shelve.open('1p')
                         p1 = shelf['p1']
                         p2 = shelf['p2']
@@ -888,7 +946,6 @@ def game_1p(screen,win,save):
                         shelf['win'] = win
                         shelf['a'] = a
                         shelf.close()
-                        print('Hi')
             if l == 1:
                 break
         if win == 1:
@@ -921,7 +978,7 @@ def game_1p(screen,win,save):
         if q == 1:
             return 0
         refresh(DISPLAYSURF,p1,p2,p3,p4,dealt,deck,trump,w)
-        if w[0] + w[2] == 7:
+        if w[0] + w[2] == 14 - suits:
             DISPLAYSURF.fill(win1)
             fontObj = pygame.font.Font('freesansbold.ttf', 64)
             textSurfaceObj = fontObj.render('Team 1 wins', True, win1, green)
@@ -934,7 +991,7 @@ def game_1p(screen,win,save):
                 return a
             elif a == 2 or a == 4:
                 return (a+1)%4
-        elif w[1] + w[3] == 7:
+        elif w[1] + w[3] == suits:
             DISPLAYSURF.fill(win2)
             fontObj = pygame.font.Font('freesansbold.ttf', 64)
             textSurfaceObj = fontObj.render('Team 2 wins', True, win1, green)
@@ -980,7 +1037,6 @@ def game_4p(screen,win,save):
                     if mouse[0] > 650 and mouse[0] < 850 and mouse[1] > 470 and mouse[1] < 510:
                         l = 1
                     if mouse[0] > 1300 and mouse[0] < 1500 and mouse[1] > 150 and mouse[1] < 190:
-                        print('Hello')
                         shelf = shelve.open('4p')
                         p1 = shelf['p1']
                         p2 = shelf['p2']
@@ -1006,7 +1062,6 @@ def game_4p(screen,win,save):
                         shelf['win'] = win
                         shelf['a'] = a
                         shelf.close()
-                        print('Hi')
             if l == 1:
                 break
         if win == 1:
@@ -1130,7 +1185,6 @@ def game_3p(screen,win,save):
                     if mouse[0] > 650 and mouse[0] < 850 and mouse[1] > 470 and mouse[1] < 510:
                         l = 1
                     if mouse[0] > 1300 and mouse[0] < 1500 and mouse[1] > 150 and mouse[1] < 190:
-                        print('Hello')
                         shelf = shelve.open('3p')
                         p1 = shelf['p1']
                         p2 = shelf['p2']
@@ -1156,7 +1210,6 @@ def game_3p(screen,win,save):
                         shelf['win'] = win
                         shelf['a'] = a
                         shelf.close()
-                        print('Hi')
             if l == 1:
                 break
         if win == 1:
@@ -1272,7 +1325,6 @@ def game_2p_team(screen,win,save):
                     if mouse[0] > 650 and mouse[0] < 850 and mouse[1] > 470 and mouse[1] < 510:
                         l = 1
                     if mouse[0] > 1300 and mouse[0] < 1500 and mouse[1] > 150 and mouse[1] < 190:
-                        print('Hello')
                         shelf = shelve.open('2p_team')
                         p1 = shelf['p1']
                         p2 = shelf['p2']
@@ -1298,7 +1350,6 @@ def game_2p_team(screen,win,save):
                         shelf['win'] = win
                         shelf['a'] = a
                         shelf.close()
-                        print('Hi')
             if l == 1:
                 break
         if win == 1:
@@ -1406,7 +1457,6 @@ def game_2p_rival(screen,win,save):
                     if mouse[0] > 650 and mouse[0] < 850 and mouse[1] > 470 and mouse[1] < 510:
                         l = 1
                     if mouse[0] > 1300 and mouse[0] < 1500 and mouse[1] > 150 and mouse[1] < 190:
-                        print('Hello')
                         shelf = shelve.open('2p_rival')
                         p1 = shelf['p1']
                         p2 = shelf['p2']
@@ -1432,7 +1482,6 @@ def game_2p_rival(screen,win,save):
                         shelf['win'] = win
                         shelf['a'] = a
                         shelf.close()
-                        print('Hi')
             if l == 1:
                 break
         if win == 1:
